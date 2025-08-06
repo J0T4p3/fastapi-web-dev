@@ -33,17 +33,35 @@ def insert_post(connection: Connection, post: Post,) -> None:
 
 
 if __name__ == '__main__':
+    # Create the database and table if they don't exist
     connection = sqlite3.connect('database.db')
     connection.row_factory = sqlite3.Row
 
-    new_post = Post(
-        title='Sample Post',
-        content='This is a sample post content.',
-        author='Author Name',
+    # Create the posts table
+    cursor = connection.cursor()
+    cursor.execute(
+        '''
+        CREATE TABLE IF NOT EXISTS posts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            author TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        '''
     )
+    connection.commit()
 
-    insert_post(connection, new_post)
+    # Create multiple posts for testing
+    from database import insert_post, get_posts
+    for i in range(5):
+        post = Post(title=f"Post {i+1}", content=f"This is the content of post {i+1}.", author=f"Author{i+1}")
+        insert_post(connection, post)
+    print("New posts created successfully")
 
-    print(get_posts(connection))
+    print("All posts in the database:")
+    for post in get_posts(connection).posts:
+        print(post)
 
     connection.close()

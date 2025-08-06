@@ -1,15 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test template</title>
-</head>
-<body>
-    <h1>Test Template</h1>
-    <p>This is a test template.</p>
-    <p>Current date and time: {{ current_time }}</p>
-    <p>Current user: {{ current_user }}</p>
-    <p>Current user ID: {{ current_user_id }}</p>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<title>Test template</title>
+		<script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
+	</head>
+
+	<body>
+		<h1>Posts</h1>
+		<ul id="posts">
+			{% for post in posts %}
+			<li>{{ post.title }} - {{ post.content }} ({{ post.author }})</li>
+			{% endfor %}
+		</ul>
+		<form
+			hx-post="/new_post"
+			hx-target="#posts"
+			hx-swap="innerHTML"
+			hx-trigger="submit"
+			hx-ext="json-enc"
+		>
+			<input
+				type="text"
+				name="title"
+				placeholder="Title"
+				required
+			/>
+			<textarea
+				name="content"
+				placeholder="Content"
+				required
+			></textarea>
+			<input
+				type="text"
+				name="author"
+				placeholder="Author"
+				required
+			/>
+			<button type="submit">Create Post</button>
+		</form>
+	</body>
 </html>

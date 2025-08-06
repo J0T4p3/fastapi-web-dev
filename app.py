@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
 from models import Posts, Post
 from sqlite3 import Connection, Row
@@ -13,18 +14,20 @@ connection.row_factory = Row  # This allows us to access columns by name
 
 
 @app.get("/")
-async def home() -> HTMLResponse:
-    return templates.TemplateResponse("index.html", {"request": {}})
+async def home(request:Request) -> HTMLResponse:
+    from database import get_posts
+    posts = get_posts(connection).posts
+    return templates.TemplateResponse(request, "index.html", context={"posts": posts})
 
 
 @app.get("/posts")
-async def posts() -> Posts:
+async def posts(request: Request) -> Posts:
     from database import get_posts
-    return get_posts(connection)
+    posts = get_posts(connection)
+    return posts
 
 
 @app.post("/new_post")
 async def create_post(post: Post) -> None:
     from database import insert_post
     insert_post(connection, post)
-    return {"code": 200, "message": "Post created successfully"}
